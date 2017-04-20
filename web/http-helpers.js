@@ -18,7 +18,7 @@ exports.serveAssets = function(res, asset, callback) {
 };
 
 exports.writeFile = function(res, site, callback) {
-
+  fs.writeFile(asset, callback);
 };
 
 
