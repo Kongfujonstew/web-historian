@@ -1,6 +1,8 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var archive = require('../helpers/archive-helpers');
+var sites = '../test/testdata/sites.txt';
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -26,15 +28,53 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, 'utf-8', function(err, content) {
+    if (err) {
+      throw err;
+    } else {
+      callback(content.split("\n"));
+    }
+  });
 };
 
 exports.isUrlInList = function(url, callback) {
+  fs.readFile(exports.paths.list, 'utf-8', function (err, content) {
+    if (err) {
+      console.log(err);
+    } else {
+      var dopeListOfUrls = content.split("\n");
+      if (_.contains(dopeListOfUrls, url)) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    }
+  });
 };
 
 exports.addUrlToList = function(url, callback) {
+  fs.writeFile(exports.paths.list, url + '\n', function (err, content) {
+    if (err) {
+      console.log(err);
+    } else {
+      callback();
+    }
+  });
+
 };
 
 exports.isUrlArchived = function(url, callback) {
+  fs.readdir(exports.paths.archivedSites, function(err, dopeAssListOfSites) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (_.contains(dopeAssListOfSites, url)) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    }
+  });
 };
 
 exports.downloadUrls = function(urls) {
