@@ -87,34 +87,4 @@ exports.downloadUrls = function(urls) {
 };
 
 
-
-
-
-
-// exports.serveAssets = function(res, asset, callback) {
-
-//   var encoding = {encoding: 'utf8'};
-//   fs.readFile( archive.paths.siteAssets + asset, encoding, function(err, data) {
-//     if (err) {
-//       // file doesn't exist in public!
-//       fs.readFile( archive.paths.archivedSites + asset, encoding, function(err, data) {
-//         if (err) {
-//           // file doesn't exist in archive!
-//           callback ? callback() : exports.send404(res);
-//         } else {
-//           exports.sendResponse(res, data);
-//         }
-//       });
-//     } else {
-//       exports.sendResponse(res, data);
-//     }
-//   });
-// };
-
-
-
-
-
-
-
 // exports.syncodemayo = Promise.promisifyAll

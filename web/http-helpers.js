@@ -1,7 +1,8 @@
-var path = require('path');
 var fs = require('fs');
-var archive = require('../helpers/archive-helpers');
+var path = require('path');
+var request = require('request');
 var Promise = require('bluebird');
+var archive = require('../helpers/archive-helpers');
 
 var readFile = Promise.promisify(fs.readFile);
 
@@ -15,14 +16,11 @@ exports.headers = {
 
 
 exports.serveAssets = function(res, asset, callback) {
-
   var encoding = {encoding: 'utf8'};
   fs.readFile( archive.paths.siteAssets + asset, encoding, function(err, data) {
     if (err) {
-      // file doesn't exist in public!
       fs.readFile( archive.paths.archivedSites + asset, encoding, function(err, data) {
         if (err) {
-          // file doesn't exist in archive!
           callback ? callback() : exports.send404(res);
         } else {
           exports.sendResponse(res, data);
@@ -35,11 +33,21 @@ exports.serveAssets = function(res, asset, callback) {
 };
 
 
-exports.writeFile = function(res, site, callback) {
-  fs.writeFile(asset, callback);
+exports.cd = function(request, callback) {
+  var data = '';
+  request.on('data', function(chunk) {
+    data += chunk;
+  });
+  request.on('end', function() {
+    callback(data);
+  });
 };
 
-
+exports.sendRedirect = function(response, location, status) {
+  status = status || 302;
+  response.writeHead(status, {Location: location});
+  response.end();
+};
 
 
 exports.sendResponse = function(response, obj, status) {
