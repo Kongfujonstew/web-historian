@@ -4,6 +4,7 @@ var _ = require('underscore');
 var archive = require('../helpers/archive-helpers');
 var sites = '../test/testdata/sites.txt';
 
+
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -53,6 +54,7 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
+  
   fs.writeFile(exports.paths.list, url + '\n', function (err, content) {
     if (err) {
       console.log(err);
@@ -78,4 +80,41 @@ exports.isUrlArchived = function(url, callback) {
 };
 
 exports.downloadUrls = function(urls) {
+  _.each(urls, function (url) {
+    if (!url) { return; }
+    request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
+  });
 };
+
+
+
+
+
+
+// exports.serveAssets = function(res, asset, callback) {
+
+//   var encoding = {encoding: 'utf8'};
+//   fs.readFile( archive.paths.siteAssets + asset, encoding, function(err, data) {
+//     if (err) {
+//       // file doesn't exist in public!
+//       fs.readFile( archive.paths.archivedSites + asset, encoding, function(err, data) {
+//         if (err) {
+//           // file doesn't exist in archive!
+//           callback ? callback() : exports.send404(res);
+//         } else {
+//           exports.sendResponse(res, data);
+//         }
+//       });
+//     } else {
+//       exports.sendResponse(res, data);
+//     }
+//   });
+// };
+
+
+
+
+
+
+
+// exports.syncodemayo = Promise.promisifyAll

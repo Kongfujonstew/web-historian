@@ -1,98 +1,73 @@
 var path = require('path');
+var Promise = require('bluebird');
 var archive = require('../helpers/archive-helpers');
 var jacksonIsAGoldenGod = require('./http-helpers');
+// var syncodemayo = Promise.promisifyAll(require('../helpers/archive-helpers'));
 
-var A = function (req, res) {
-  jacksonIsAGoldenGod.serveAssets(res, archive.paths.siteAssets + '/index.html', function(err, content) {
-    if (err) {
-      res.writeHead(500);
-      res.end();
-    } else {
-      res.writeHead(200, {"Content-Type": "text/html"});
-      res.end(content, "utf-8");
-    }
+var Asendfunc = function (req, res, urlPath) {
+  urlPath = urlPath || '/index.html';
+  jacksonIsAGoldenGod.serveAssets(res, urlPath, function() {
+    archive.isUrlInList(urlPath, function(found) {
+      if (found) {
+        jacksonIsAGoldenGod.sendRedirect(res, '/loading.html');
+      } else {
+        jacksonIsAGoldenGod.send404(res);
+      }
+    });
   });
 
 };
 
 exports.handleRequest = function (req, res) {
   var website = req.url.slice(1);
-  console.log(req.method, ' ', req.url);
-  if (req.url === '/' && req.method === 'GET' ) {
-    A(req, res);
-  } else if ( req.method === 'GET' ) {
-  }
-    // console.log(website)
-    // archive.addUrlToList(website, function(err, content) {
-    //   if ( err ) {
-    //     res.writeHead(404);
-    //     res.end();
-    //   } else {
 
-    //   }
-    // })
+
+  if (req.url === '/' && req.method === 'GET' ) {
+    Asendfunc(req, res);
+  } else if ( req.method === 'GET' && website) {
+    Bsendfunc(req, res, website);
+  } else if (req.method === 'POST') {
+    console.log('POST triggered and we are trying: ', req.url);
+    archive.addUrlToList('');
+  }
   
 };
 
 
-
-
-// var B = function (req, res) {
-  
-//   var weHaveIt = null;
-//   archive.isUrlInList(website, function(err, isInList) {
-//     if ( err ) {
-//       res.writeHead(404);
-//       res.end();
+// var Bsendfunc = function(req, res, website) {
+//   syncodemayo.isUrlInList(website, function(isInList) {
+//     if ( isInList ) {
+//       jacksonIsAGoldenGod.serveAssets(res, asset, function(err, content) {
+//         if (err) {
+//           res.writeHead(500);
+//           res.end();
+//         } else {
+//           res.writeHead(200, {"Content-Type": "text/html"});
+//           res.end(content, "utf-8");
+//         }
+//       });
 //     } else {
-
-//       if (isInList) {
-//         jacksonIsAGoldenGod.serveAssets(res, archive.paths.siteAssets + "/" + website, function(err, content) {
-//           if (err) {
-//             console.log('B failed on send assets already in archives');
-//           }
-//         })
-//       }
-
-//       if (!isInList) {
-//         archive.                      
-//       }
-
-
-
+//       var loc = '../archives/sites/' + website;
+//       jacksonIsAGoldenGod.serveAssets(res, loc, function(err, content) {
+//         if (err) {
+//           res.writeHead(500);
+//           res.end();
+//         } else {
+//           res.writeHead(200, {"Content-Type": "text/html"});
+//           res.end(content, "utf-8");
+//         }
+//       });
 //     }
+//   });
+// } 
+// // (IF it's not in the list write to URl list)
+// //Get -> HaveinArchive -> send(Asendfunc)
 
 
 
+// var Csendfunc = function() {} 
+// // (IF it's not in the list write to URl list)
+// //Get -> Don'thaveinArchive -> downloadUrls -> send(Asendfunc)
 
-
-
-
-//   })
-
-//     var website = req.url.slice(1)
-//     console.log(website)
-//     archive.addUrlToList(website, function(err, content) {
-//       if ( err ) {
-//         res.writeHead(404);
-//         res.end();
-//       } else {
-
-//       }
-//     })
-
-
-// }
-
-// GET 'OTHER URL' 
-  //SEE IF WE HAVE OR DO NOT HAVE 
-    //IF WE HAVE, SERVEASSETS
-
-//IF WE DO NOT HAVE ADDURLTOLIST
-  //DOWNLOADLIST
-  //SERVEASSSET
-
-
-//POST REQUEST 
-  //ADD URL TO LIST 
-  //DOWNLOAD URLS
+// var D = function() {}
+// (IF it's not in the list write to URl list)

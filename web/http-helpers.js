@@ -1,6 +1,9 @@
 var path = require('path');
 var fs = require('fs');
 var archive = require('../helpers/archive-helpers');
+var Promise = require('bluebird');
+
+var readFile = Promise.promisify(fs.readFile);
 
 exports.headers = {
   'access-control-allow-origin': '*',
@@ -10,12 +13,27 @@ exports.headers = {
   'Content-Type': 'text/html'
 };
 
+
 exports.serveAssets = function(res, asset, callback) {
-  fs.readFile(asset, callback);
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
+
+  var encoding = {encoding: 'utf8'};
+  fs.readFile( archive.paths.siteAssets + asset, encoding, function(err, data) {
+    if (err) {
+      // file doesn't exist in public!
+      fs.readFile( archive.paths.archivedSites + asset, encoding, function(err, data) {
+        if (err) {
+          // file doesn't exist in archive!
+          callback ? callback() : exports.send404(res);
+        } else {
+          exports.sendResponse(res, data);
+        }
+      });
+    } else {
+      exports.sendResponse(res, data);
+    }
+  });
 };
+
 
 exports.writeFile = function(res, site, callback) {
   fs.writeFile(asset, callback);
@@ -23,4 +41,13 @@ exports.writeFile = function(res, site, callback) {
 
 
 
-// As you progress, keep thinking about what helper functions you can put here!
+
+exports.sendResponse = function(response, obj, status) {
+  status = status || 200;
+  response.writeHead(status, exports.headers);
+  response.end(obj);
+};
+
+exports.send404 = function(response) {
+  exports.sendResponse(response, '404: Page not found', 404);
+};
